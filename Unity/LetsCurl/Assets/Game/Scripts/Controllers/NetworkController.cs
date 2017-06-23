@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class NetworkController : MonoBehaviour {
-	public string host = "ws://localhost:8080";
+	public string host = "";
 	private WebSocket ws;
 	private IEnumerator wsCoroutine;
 
