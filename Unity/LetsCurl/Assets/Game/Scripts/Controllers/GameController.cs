@@ -15,6 +15,11 @@ public class GameController : BootableMonoBehaviour {
 	}
 
 	public override void Boot(){
-		
+		NetworkController.Instance.RegisterReady(NetworkControllerIsReady);
+		NetworkController.Instance.Init();
+	}
+
+	private void NetworkControllerIsReady(){
+		Debug.Log("Wooooo lets do this");
 	}
 }
