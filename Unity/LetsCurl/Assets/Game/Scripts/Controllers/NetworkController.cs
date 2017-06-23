@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class NetworkController:MonoBehaviour {
+public class NetworkController : MonoBehaviour {
 	public string host = "ws://localhost";
 	private WebSocket ws;
 	private IEnumerator wsCoroutine;
