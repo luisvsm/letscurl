@@ -47,6 +47,9 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\Example\EchoTest.cs" />
+     <Compile Include="Assets\Game\Scripts\Controllers\BootController.cs" />
+     <Compile Include="Assets\Game\Scripts\Controllers\GameController.cs" />
+     <Compile Include="Assets\Game\Scripts\Controllers\NetworkController.cs" />
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Program Files/Unity_5_5_0/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
  </Reference>
