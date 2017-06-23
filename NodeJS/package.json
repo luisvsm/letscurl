@@ -1,0 +1,14 @@
+{
+  "name": "letscurl",
+  "version": "1.0.0",
+  "description": "Lets Curl - Deakin Winter Jam",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified :D \" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "ws": "^3.0.0"
+  }
+}
