@@ -48,7 +48,7 @@ public class GameController : BootableMonoBehaviour {
 		}
 		CurrentStone.transform.position = position;
 		CurrentStone.transform.eulerAngles = new Vector3(0f,0f,0f);
-		CurrentStone.GetComponent<Rigidbody>().AddForce(forceVector*forceMuliplyer, ForceMode.VelocityChange);
+		CurrentStone.GetComponent<Rigidbody>().AddForce((forceVector*forceMuliplyer) - CurrentStone.GetComponent<Rigidbody>().velocity, ForceMode.VelocityChange);
 		InputController.Instance.TurnOffInput();
 		followStone = true;
 	}
