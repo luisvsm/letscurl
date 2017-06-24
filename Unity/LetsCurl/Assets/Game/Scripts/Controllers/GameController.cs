@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class GameController : BootableMonoBehaviour {
 
+	List<GameObject> StonePool = new List<GameObject>();
 	private static GameController _instance;
 	public static GameController Instance {
 		get{

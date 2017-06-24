@@ -24,10 +24,11 @@ public class InputController : BootableMonoBehaviour {
 	List<Vector3> previousPosition = new List<Vector3>();
 	Vector3 currentPosition = new Vector3();
 	Vector3 inputPos;
-	bool resetPrevious;
+	bool fingerIsDown;
 	public int positionPoolLength = 4;
 	public float updateTime = 0.01f;
 	float timeUntilNextUpdate;
+	public GameObject stone;
 	// Update is called once per frame
 	void Update () {
 
@@ -37,11 +38,14 @@ public class InputController : BootableMonoBehaviour {
 		}else if(Input.GetMouseButton(0)){
         	inputPos = Input.mousePosition;
 		}else{
-			resetPrevious = true;
+			if(fingerIsDown){
+				Instantiate(stone, currentPosition, Quaternion.identity);
+				fingerIsDown = false;
+			}
 			previousPosition.Clear();
 			return;
 		}
-		
+		fingerIsDown = true; // By now we have input
 		//Update currentPosition to the current world position of the player's finger
 		updateCurrentInputPosition();
 			
@@ -65,10 +69,6 @@ public class InputController : BootableMonoBehaviour {
 		if (groundPlane.Raycast(ray, out rayDistance)){
 			//Hit
 			currentPosition = ray.GetPoint(rayDistance);
-			if(resetPrevious){
-				previousPosition.Add(currentPosition);
-				resetPrevious = false;
-			}
 		}else{
 			//Miss
 		}
