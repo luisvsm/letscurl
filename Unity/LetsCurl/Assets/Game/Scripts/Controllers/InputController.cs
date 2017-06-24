@@ -28,7 +28,6 @@ public class InputController : BootableMonoBehaviour {
 	public int positionPoolLength = 4;
 	public float updateTime = 0.01f;
 	float timeUntilNextUpdate;
-	public GameObject stone;
 	// Update is called once per frame
 	void Update () {
 
@@ -39,7 +38,7 @@ public class InputController : BootableMonoBehaviour {
         	inputPos = Input.mousePosition;
 		}else{
 			if(fingerIsDown){
-				Instantiate(stone, currentPosition, Quaternion.identity);
+				GameController.Instance.ThrowStone(currentPosition, currentPosition - previousPosition[0]);
 				fingerIsDown = false;
 			}
 			previousPosition.Clear();
@@ -47,23 +46,28 @@ public class InputController : BootableMonoBehaviour {
 		}
 		fingerIsDown = true; // By now we have input
 		//Update currentPosition to the current world position of the player's finger
-		updateCurrentInputPosition();
-			
-		
-		timeUntilNextUpdate -= Time.deltaTime;
+		UpdateCurrentInputPosition();
+		UpdatePositionHistory();
+		GameController.Instance.SetThrowingStone(currentPosition);
 		//currentPosition = Camera.main.ScreenToWorldPoint(new Vector3(pos.x, pos.y, Camera.main.nearClipPlane));
+		
+	}
+
+	void UpdatePositionHistory(){
+		timeUntilNextUpdate -= Time.deltaTime;
 		if(timeUntilNextUpdate<0){
 			timeUntilNextUpdate = updateTime;
 			previousPosition.Add(currentPosition);
 			if(previousPosition.Count > positionPoolLength)
 				previousPosition.RemoveAt(0);
 		}
+
 		if(prevObj != null && currentObj != null){
 			prevObj.transform.position = previousPosition[0];
 			currentObj.transform.position = currentPosition;
 		}
 	}
-	void updateCurrentInputPosition(){
+	void UpdateCurrentInputPosition(){
 		Ray ray = Camera.main.ScreenPointToRay(inputPos);
 		float rayDistance;
 		if (groundPlane.Raycast(ray, out rayDistance)){
