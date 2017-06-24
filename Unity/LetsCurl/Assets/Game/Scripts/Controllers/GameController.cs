@@ -1,9 +1,12 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GameController : BootableMonoBehaviour {
-
+	public GameObject distanceMeter;
+	public Text distanceMeterText;
 	public GameObject stonePrefab;
 	private GameObject _currentStone;
 	List<GameObject> StonePool = new List<GameObject>();
@@ -34,8 +37,18 @@ public class GameController : BootableMonoBehaviour {
 	bool followStone;
 	public float forceMuliplyer = 1;
 	public void SetThrowingStone(Vector3 position){
+		if(
+			position.z > -36 ||
+			(Camera.main.transform.position - restingCameraPosition).magnitude > 0.1f
+		){
+			CurrentStone.SetActive(false);
+			CurrentStone = null;
+			return;
+		}
+		CurrentStone.SetActive(true);
 		CurrentStone.transform.position = position;
 		CurrentStone.transform.eulerAngles = new Vector3(0f,0f,0f);
+		CurrentStone.GetComponent<Rigidbody>().AddForce(-CurrentStone.GetComponent<Rigidbody>().velocity, ForceMode.VelocityChange);
 	}
 	public void ThrowStone(Vector3 position, Vector3 forceVector){
 		if(
@@ -46,9 +59,12 @@ public class GameController : BootableMonoBehaviour {
 			CurrentStone = null;
 			return;
 		}
+		distanceMeter.SetActive(true);
+		CurrentStone.SetActive(true);
+		CurrentStone.GetComponent<Rigidbody>().AddForce(-CurrentStone.GetComponent<Rigidbody>().velocity, ForceMode.VelocityChange);
 		CurrentStone.transform.position = position;
 		CurrentStone.transform.eulerAngles = new Vector3(0f,0f,0f);
-		CurrentStone.GetComponent<Rigidbody>().AddForce((forceVector*forceMuliplyer) - CurrentStone.GetComponent<Rigidbody>().velocity, ForceMode.VelocityChange);
+		CurrentStone.GetComponent<Rigidbody>().AddForce((forceVector*forceMuliplyer), ForceMode.VelocityChange);
 		InputController.Instance.TurnOffInput();
 		followStone = true;
 	}
@@ -73,6 +89,7 @@ public class GameController : BootableMonoBehaviour {
 
 	int atRestCount;
 	void FixedUpdate(){
+		distanceMeterText.text = Math.Round((CurrentStone.transform.position - new Vector3(0f, -0.05f, 57f)).magnitude, 2).ToString();
 		if(followStone){
 			Camera.main.transform.position = Vector3.Lerp(Camera.main.transform.position, new Vector3(followCameraPosition.x, followCameraPosition.y, CurrentStone.transform.position.z + followCameraPosition.z), 0.3f);
 			Camera.main.transform.eulerAngles = Vector3.Lerp(Camera.main.transform.eulerAngles, followRotation, 0.2f);
@@ -97,7 +114,9 @@ public class GameController : BootableMonoBehaviour {
 	}
 
 	private void resetShot(){
+		distanceMeter.SetActive(false);
 		CurrentStone = null;
+		CurrentStone.SetActive(false);
 		followStone = false;
 		InputController.Instance.TurnOnInput();
 	}
