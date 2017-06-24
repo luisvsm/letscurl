@@ -5,6 +5,8 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public class GameController : BootableMonoBehaviour {
+	public Animator outOfBoundsAnimation;
+	public float targetFriction = 0.08f;
 	public GameObject distanceMeter;
 	public Text distanceMeterText;
 	public GameObject stonePrefab;
@@ -124,8 +126,9 @@ public class GameController : BootableMonoBehaviour {
 	public void CleanUpFallenStones(){
 		for (int i = 0; i < StonePool.Count; i++)
 		{
-			if(StonePool[i].activeSelf && StonePool[i].transform.position.y < -10){
+			if(StonePool[i].activeSelf && StonePool[i].transform.position.y < -1){
 				StonePool[i].SetActive(false);
+				outOfBoundsAnimation.SetTrigger("FlashNow");
 			}
 		}
 	}
@@ -135,6 +138,7 @@ public class GameController : BootableMonoBehaviour {
 			if(StonePool[i].activeSelf){
 				if(StonePool[i].transform.position.z > 69 || StonePool[i].transform.position.z < 36){
 					StonePool[i].SetActive(false); // Clean up rouge stones
+					outOfBoundsAnimation.SetTrigger("FlashNow");
 				}
 			}
 		}
