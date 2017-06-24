@@ -24,13 +24,14 @@ public class InputController : BootableMonoBehaviour {
 	List<Vector3> previousPosition = new List<Vector3>();
 	Vector3 currentPosition = new Vector3();
 	Vector3 inputPos;
+	bool acceptInput;
 	bool fingerIsDown;
 	public int positionPoolLength = 4;
 	public float updateTime = 0.01f;
 	float timeUntilNextUpdate;
 	// Update is called once per frame
 	void Update () {
-
+		if(!acceptInput) return;
 		if(Input.touches.Length > 0){
 			Touch t = Input.touches[0];
         	inputPos = t.position;
@@ -51,6 +52,16 @@ public class InputController : BootableMonoBehaviour {
 		GameController.Instance.SetThrowingStone(currentPosition);
 		//currentPosition = Camera.main.ScreenToWorldPoint(new Vector3(pos.x, pos.y, Camera.main.nearClipPlane));
 		
+	}
+
+	public void TurnOnInput(){
+		acceptInput = true;
+	}
+	public void TurnOffInput(){
+		acceptInput = false;
+	}
+	public bool InputIsOn(){
+		return acceptInput;
 	}
 
 	void UpdatePositionHistory(){
