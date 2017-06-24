@@ -25,6 +25,9 @@ public class InputController : BootableMonoBehaviour {
 	Vector3 currentPosition = new Vector3();
 	Vector3 inputPos;
 	bool resetPrevious;
+	public int positionPoolLength = 4;
+	public float updateTime = 0.01f;
+	float timeUntilNextUpdate;
 	// Update is called once per frame
 	void Update () {
 
@@ -35,6 +38,7 @@ public class InputController : BootableMonoBehaviour {
         	inputPos = Input.mousePosition;
 		}else{
 			resetPrevious = true;
+			previousPosition.Clear();
 			return;
 		}
 		
@@ -42,11 +46,12 @@ public class InputController : BootableMonoBehaviour {
 		updateCurrentInputPosition();
 			
 		
-
+		timeUntilNextUpdate -= Time.deltaTime;
 		//currentPosition = Camera.main.ScreenToWorldPoint(new Vector3(pos.x, pos.y, Camera.main.nearClipPlane));
-		if((previousPosition[0] - currentPosition).magnitude>0.1){
+		if(timeUntilNextUpdate<0){
+			timeUntilNextUpdate = updateTime;
 			previousPosition.Add(currentPosition);
-			if(previousPosition.Count > 3)
+			if(previousPosition.Count > positionPoolLength)
 				previousPosition.RemoveAt(0);
 		}
 		if(prevObj != null && currentObj != null){
