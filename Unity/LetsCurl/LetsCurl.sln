@@ -1,9 +1,9 @@
+﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2008
-
-Project("{1CEFF2E9-4D74-F844-3745-45AE89450288}") = "LetsCurl", "Assembly-CSharp-firstpass.csproj", "{D1B39706-E0B6-EED0-43B9-3A08A8827307}"
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LetsCurl", "Assembly-CSharp-firstpass.csproj", "{D1B39706-E0B6-EED0-43B9-3A08A8827307}"
 EndProject
-Project("{1CEFF2E9-4D74-F844-3745-45AE89450288}") = "LetsCurl", "Assembly-CSharp.csproj", "{2A3657C2-14D1-7FDE-F480-CA454FE75479}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LetsCurl", "Assembly-CSharp.csproj", "{2A3657C2-14D1-7FDE-F480-CA454FE75479}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

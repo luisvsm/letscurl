@@ -53,7 +53,7 @@ public class NetworkController : MonoBehaviour {
 		Debug.Log("Sending ready");
 		ReadyAction();
 
-		ws.SendString("Hi there");
+		ws.SendString("Hello from client");
 
 		int i=0;
 		while (true)
@@ -61,8 +61,8 @@ public class NetworkController : MonoBehaviour {
 			string reply = ws.RecvString();
 			if (reply != null)
 			{
-				Debug.Log ("Received: "+reply);
-				ws.SendString("Hi there"+i++);
+				Debug.Log ("Received: " + reply);
+				ws.SendString("Got it!"+i++);
 			}
 			if (ws.error != null)
 			{
