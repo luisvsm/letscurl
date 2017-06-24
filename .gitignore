@@ -2,3 +2,4 @@ NodeJS/node_modules/
 Unity/LetsCurl/Library/
 Unity/LetsCurl/Temp/
 NodeJS/Client/
+*.apk

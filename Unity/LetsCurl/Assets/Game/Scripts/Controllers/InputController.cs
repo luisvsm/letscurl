@@ -21,7 +21,7 @@ public class InputController : BootableMonoBehaviour {
 	public GameObject currentObj;
 	public GameObject prevObj;
 
-	Vector3 previousPosition = new Vector3();
+	List<Vector3> previousPosition = new List<Vector3>();
 	Vector3 currentPosition = new Vector3();
 	Vector3 inputPos;
 	bool resetPrevious;
@@ -29,7 +29,6 @@ public class InputController : BootableMonoBehaviour {
 	void Update () {
 
 		if(Input.touches.Length > 0){
-			
 			Touch t = Input.touches[0];
         	inputPos = t.position;
 		}else if(Input.GetMouseButton(0)){
@@ -45,15 +44,13 @@ public class InputController : BootableMonoBehaviour {
 		
 
 		//currentPosition = Camera.main.ScreenToWorldPoint(new Vector3(pos.x, pos.y, Camera.main.nearClipPlane));
-		if((previousPosition - currentPosition).magnitude>1){
-			Debug.Log("currentPosition: " + currentPosition);
-			Debug.Log("previousPosition: " + previousPosition);
-			Debug.DrawRay(currentPosition, previousPosition - currentPosition, Color.red);
-			Debug.DrawLine(currentPosition, previousPosition, Color.blue);
-			previousPosition = currentPosition;
+		if((previousPosition[0] - currentPosition).magnitude>0.1){
+			previousPosition.Add(currentPosition);
+			if(previousPosition.Count > 3)
+				previousPosition.RemoveAt(0);
 		}
 		if(prevObj != null && currentObj != null){
-			prevObj.transform.position = previousPosition;
+			prevObj.transform.position = previousPosition[0];
 			currentObj.transform.position = currentPosition;
 		}
 	}
@@ -64,7 +61,7 @@ public class InputController : BootableMonoBehaviour {
 			//Hit
 			currentPosition = ray.GetPoint(rayDistance);
 			if(resetPrevious){
-				previousPosition = currentPosition;
+				previousPosition.Add(currentPosition);
 				resetPrevious = false;
 			}
 		}else{
