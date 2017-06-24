@@ -7,6 +7,10 @@ public class GameController : BootableMonoBehaviour {
 	public GameObject stonePrefab;
 	private GameObject _currentStone;
 	List<GameObject> StonePool = new List<GameObject>();
+	public Vector3 followCameraPosition = new Vector3(0f, 38.3f, -15f);
+	public Vector3 followRotation = new Vector3(56.3f, 0f, 0f);
+	public Vector3 restingCameraPosition =  new Vector3(0f, 20f, -71.1f);
+	public Vector3 restingRotation = new Vector3(42.7f, 0f, 0f);
 	GameObject CurrentStone{
 		get{
 			if(_currentStone == null){
@@ -23,18 +27,28 @@ public class GameController : BootableMonoBehaviour {
 			}
 			return _currentStone;
 		}
+		set{
+			_currentStone = value;
+		}
 	}
 	bool followStone;
 	public float forceMuliplyer = 1;
 	public void SetThrowingStone(Vector3 position){
 		CurrentStone.transform.position = position;
 	}
-	Vector3 originalCameraPosition;
 	public void ThrowStone(Vector3 position, Vector3 forceVector){
+		if(
+			position.z > -36 ||
+			(Camera.main.transform.position - restingCameraPosition).magnitude > 0.1f
+		){
+			CurrentStone.SetActive(false);
+			CurrentStone = null;
+			return;
+		}
+		CurrentStone.transform.position = position;
 		CurrentStone.GetComponent<Rigidbody>().AddForce(forceVector*forceMuliplyer, ForceMode.VelocityChange);
 		InputController.Instance.TurnOffInput();
 		followStone = true;
-		originalCameraPosition = Camera.main.transform.position;
 	}
 
 	private static GameController _instance;
@@ -50,20 +64,18 @@ public class GameController : BootableMonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		InputController.Instance.TurnOnInput();
-		originalCameraPosition = Camera.main.transform.position;
 	}
 	// Update is called once per frame
 	void Update () {
-		if(followStone){
-			Camera.main.transform.position = Vector3.Lerp(Camera.main.transform.position, new Vector3(Camera.main.transform.position.x, Camera.main.transform.position.y, CurrentStone.transform.position.z - 15), 0.3f);
-		}else{
-			Camera.main.transform.position = Vector3.MoveTowards(Camera.main.transform.position, originalCameraPosition, 1);
-		}
 	}
 
-	int frame = 0;
 	int atRestCount;
 	void FixedUpdate(){
+		if(followStone){
+			Camera.main.transform.position = Vector3.Lerp(Camera.main.transform.position, new Vector3(followCameraPosition.x, followCameraPosition.y, CurrentStone.transform.position.z + followCameraPosition.z), 0.3f);
+		}else{
+			Camera.main.transform.position = Vector3.MoveTowards(Camera.main.transform.position, restingCameraPosition, 1);
+		}
 		CleanUpFallenStones();
 
 		if(StonesAreAtRest()){
@@ -75,12 +87,13 @@ public class GameController : BootableMonoBehaviour {
 		}
 
 		if(!InputController.Instance.InputIsOn() && atRestCount == 10){
+			CleanUpOutOfBounds();
 			resetShot();
 		}
 	}
 
 	private void resetShot(){
-		_currentStone = null;
+		CurrentStone = null;
 		followStone = false;
 		InputController.Instance.TurnOnInput();
 	}
@@ -93,7 +106,16 @@ public class GameController : BootableMonoBehaviour {
 			}
 		}
 	}
-
+	public void CleanUpOutOfBounds(){
+		for (int i = 0; i < StonePool.Count; i++)
+		{	
+			if(StonePool[i].activeSelf){
+				if(StonePool[i].transform.position.z > 69 || StonePool[i].transform.position.z < 36){
+					StonePool[i].SetActive(false); // Clean up rouge stones
+				}
+			}
+		}
+	}
 	public bool StonesAreAtRest(){
 		for (int i = 0; i < StonePool.Count; i++)
 		{	
