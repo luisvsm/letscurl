@@ -35,6 +35,7 @@ public class GameController : BootableMonoBehaviour {
 	public float forceMuliplyer = 1;
 	public void SetThrowingStone(Vector3 position){
 		CurrentStone.transform.position = position;
+		CurrentStone.transform.eulerAngles = new Vector3(0f,0f,0f);
 	}
 	public void ThrowStone(Vector3 position, Vector3 forceVector){
 		if(
@@ -46,6 +47,7 @@ public class GameController : BootableMonoBehaviour {
 			return;
 		}
 		CurrentStone.transform.position = position;
+		CurrentStone.transform.eulerAngles = new Vector3(0f,0f,0f);
 		CurrentStone.GetComponent<Rigidbody>().AddForce(forceVector*forceMuliplyer, ForceMode.VelocityChange);
 		InputController.Instance.TurnOffInput();
 		followStone = true;
@@ -73,8 +75,10 @@ public class GameController : BootableMonoBehaviour {
 	void FixedUpdate(){
 		if(followStone){
 			Camera.main.transform.position = Vector3.Lerp(Camera.main.transform.position, new Vector3(followCameraPosition.x, followCameraPosition.y, CurrentStone.transform.position.z + followCameraPosition.z), 0.3f);
+			Camera.main.transform.eulerAngles = Vector3.Lerp(Camera.main.transform.eulerAngles, followRotation, 0.2f);
 		}else{
 			Camera.main.transform.position = Vector3.MoveTowards(Camera.main.transform.position, restingCameraPosition, 1);
+			Camera.main.transform.eulerAngles = Vector3.Lerp(Camera.main.transform.eulerAngles, restingRotation, 0.2f);
 		}
 		CleanUpFallenStones();
 
