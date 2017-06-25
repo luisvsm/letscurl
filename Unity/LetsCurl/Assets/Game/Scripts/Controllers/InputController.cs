@@ -24,7 +24,7 @@ public class InputController : BootableMonoBehaviour {
 	List<Vector3> previousPosition = new List<Vector3>();
 	Vector3 currentPosition = new Vector3();
 	Vector3 inputPos;
-	bool acceptInput = true;
+	public bool acceptInput = true;
 	bool fingerIsDown;
 	public int positionPoolLength = 4;
 	public float updateTime = 0.01f;

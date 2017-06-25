@@ -12,12 +12,27 @@ public class Stone : MonoBehaviour {
 			return _rigidbody;
 		}
 	}
-	public GameController.Player owner = GameController.Player.Annon;
+	public Player player;
+	public Player.Team team {
+		get{
+			return player.team;
+		}
+	}
+	public Color Team1Colour;
+	public Color Team2Colour;
+	public SpriteRenderer sprite;
 	public void ClearTrail(){
 		if (trail == null){
 			trail = gameObject.GetComponent<TrailRenderer>();
 		}
 		trail.Clear();
+	}
+	public void setOwner(Player thePlayer){
+		player = thePlayer;
+		if(team == Player.Team.Team1)
+			sprite.color = Team1Colour;
+		if(team == Player.Team.Team2)
+			sprite.color = Team2Colour;
 	}
 	// Use this for initialization
 	void Start () {

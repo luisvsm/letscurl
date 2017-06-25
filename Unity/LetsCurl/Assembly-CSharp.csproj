@@ -51,6 +51,7 @@
      <Compile Include="Assets\Game\Scripts\Controllers\GameController.cs" />
      <Compile Include="Assets\Game\Scripts\Controllers\InputController.cs" />
      <Compile Include="Assets\Game\Scripts\Controllers\NetworkController.cs" />
+     <Compile Include="Assets\Game\Scripts\Player.cs" />
      <Compile Include="Assets\Game\Scripts\Stone.cs" />
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Program Files/Unity_5_6_1p2/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>

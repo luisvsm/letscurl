@@ -8,20 +8,8 @@ public class GameController : BootableMonoBehaviour {
 
 	int numberOfPlayers = 4;
 	int turn = 0;
-	public enum Player
-	{
-		Annon = 0, // Something's not right
-		Player1 = 1,
-		Player2 = 2,
-		Player3 = 3,
-		Player4 = 4
-	}
-	public enum Team
-	{
-		Annon = 0, // Something's not right
-		Team1 = 1,
-		Team2 = 2
-	}
+	public List<Player> players;
+	
 	public Animator outOfBoundsAnimation;
 	public PhysicMaterial floorMaterial;
 	public GameObject distanceMeter;
@@ -56,7 +44,9 @@ public class GameController : BootableMonoBehaviour {
 	}
 	bool followStone;
 	public float forceMuliplyer = 1;
-
+	public void NextTurn(){
+		turn = (turn+1) % players.Count;
+	}
 	public void LowerFriction(float positionX, float positionY){
 		if(Mathf.Abs(positionX - CurrentStone.transform.position.x) > 3 || CurrentStone.transform.position.y > positionY){
 			return;
@@ -68,6 +58,7 @@ public class GameController : BootableMonoBehaviour {
 		floorMaterial.dynamicFriction = Mathf.Lerp(floorMaterial.dynamicFriction, originalFriction, 0.05f);
 	}
 	public void SetThrowingStone(Vector3 position){
+		CurrentStone.setOwner(players[turn]);
 		if(
 			position.z > -36 ||
 			(Camera.main.transform.position - restingCameraPosition).magnitude > 0.1f
@@ -92,7 +83,7 @@ public class GameController : BootableMonoBehaviour {
 			return;
 		}
 		distanceMeter.SetActive(true);
-		CurrentStone.owner = (Player)2;
+		CurrentStone.setOwner(players[turn]);
 		CurrentStone.ClearTrail();
 		CurrentStone.gameObject.SetActive(true);
 		CurrentStone.GetComponent<Rigidbody>().AddForce(-CurrentStone.body.velocity, ForceMode.VelocityChange);
@@ -102,6 +93,7 @@ public class GameController : BootableMonoBehaviour {
 		InputController.Instance.throwing = false;
 		InputController.Instance.sweeping = true;
 		followStone = true;
+		NextTurn();
 	}
 
 	private static GameController _instance;
@@ -174,7 +166,7 @@ public class GameController : BootableMonoBehaviour {
 		for (int i = 0; i < StonePool.Count; i++)
 		{	
 			if(StonePool[i].gameObject.activeSelf){
-				if(StonePool[i].transform.position.z > 69 || StonePool[i].transform.position.z < 36){
+				if(StonePool[i].transform.position.z > 63 || StonePool[i].transform.position.z < 36){
 					StonePool[i].gameObject.SetActive(false); // Clean up rouge stones
 					outOfBoundsAnimation.SetTrigger("FlashNow");
 				}
@@ -196,6 +188,9 @@ public class GameController : BootableMonoBehaviour {
 		InputController.Instance.sweeping = false;
 		NetworkController.Instance.RegisterReady(NetworkControllerIsReady);
 		NetworkController.Instance.Init();
+		players = new List<Player>();
+		players.Add(new Player(Player.Team.Team1, 1));
+		players.Add(new Player(Player.Team.Team2, 2));
 	}
 
 	private void NetworkControllerIsReady(){
