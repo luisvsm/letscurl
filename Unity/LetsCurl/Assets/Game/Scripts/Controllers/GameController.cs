@@ -5,6 +5,23 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public class GameController : BootableMonoBehaviour {
+
+	int numberOfPlayers = 4;
+	int turn = 0;
+	public enum Player
+	{
+		Annon = 0, // Something's not right
+		Player1 = 1,
+		Player2 = 2,
+		Player3 = 3,
+		Player4 = 4
+	}
+	public enum Team
+	{
+		Annon = 0, // Something's not right
+		Team1 = 1,
+		Team2 = 2
+	}
 	public Animator outOfBoundsAnimation;
 	public PhysicMaterial floorMaterial;
 	public GameObject distanceMeter;
@@ -60,6 +77,7 @@ public class GameController : BootableMonoBehaviour {
 			return;
 		}
 		CurrentStone.gameObject.SetActive(true);
+		CurrentStone.ClearTrail();
 		CurrentStone.transform.position = position;
 		CurrentStone.transform.eulerAngles = new Vector3(0f,0f,0f);
 		CurrentStone.GetComponent<Rigidbody>().AddForce(-CurrentStone.body.velocity, ForceMode.VelocityChange);
@@ -74,6 +92,8 @@ public class GameController : BootableMonoBehaviour {
 			return;
 		}
 		distanceMeter.SetActive(true);
+		CurrentStone.owner = (Player)2;
+		CurrentStone.ClearTrail();
 		CurrentStone.gameObject.SetActive(true);
 		CurrentStone.GetComponent<Rigidbody>().AddForce(-CurrentStone.body.velocity, ForceMode.VelocityChange);
 		CurrentStone.transform.position = position;

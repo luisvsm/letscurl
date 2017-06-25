@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Stone : MonoBehaviour {
-
-	Rigidbody _rigidbody;
+	public TrailRenderer trail;
+	public Rigidbody _rigidbody;
 	public Rigidbody body{
 		get{
 			if(_rigidbody == null)
@@ -12,15 +12,13 @@ public class Stone : MonoBehaviour {
 			return _rigidbody;
 		}
 	}
-
-	enum Owner
-	{
-		Player1 = 1,
-		Player2 = 2,
-		Player3 = 3,
-		Player4 = 4
+	public GameController.Player owner = GameController.Player.Annon;
+	public void ClearTrail(){
+		if (trail == null){
+			trail = gameObject.GetComponent<TrailRenderer>();
+		}
+		trail.Clear();
 	}
-
 	// Use this for initialization
 	void Start () {
 		
