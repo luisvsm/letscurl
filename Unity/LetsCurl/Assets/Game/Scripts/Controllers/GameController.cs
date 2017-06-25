@@ -54,6 +54,29 @@ public class GameController : BootableMonoBehaviour {
 	public void resetTutorialWaitTime(){
 		tutorialWaitTime=Time.time+4f;
 	}
+	public List<GameObject> StonesLeftIndicatorTeam1;
+	public List<GameObject> StonesLeftIndicatorTeam2;
+	public GameObject stonesLeftTeam1;
+	public GameObject stonesLeftTeam2;
+	public void SetShotsLeft(){
+		for (int i = 0; i < StonesLeftIndicatorTeam1.Count; i++)
+		{
+			if(team1Stones>i){
+				StonesLeftIndicatorTeam1[i].SetActive(true);
+			}else{
+				StonesLeftIndicatorTeam1[i].SetActive(false);
+			}
+		}
+
+		for (int i = 0; i < StonesLeftIndicatorTeam2.Count; i++)
+		{
+			if(team2Stones>i){
+				StonesLeftIndicatorTeam2[i].SetActive(true);
+			}else{
+				StonesLeftIndicatorTeam2[i].SetActive(false);
+			}
+		}
+	}
 	public void NextTurn(){
 		resetShot();
 		turn = (turn+1) % players.Count;
@@ -68,6 +91,7 @@ public class GameController : BootableMonoBehaviour {
 	}
 	public void LowerFriction(float positionX, float positionY){
 		resetTutorialWaitTime();
+		
 		if(Mathf.Abs(positionX - CurrentStone.transform.position.x) > 3 || CurrentStone.transform.position.y > positionY){
 			return;
 		}
@@ -105,7 +129,15 @@ public class GameController : BootableMonoBehaviour {
 			return;
 		}
 		distanceMeter.SetActive(true);
+		stonesLeftTeam1.SetActive(false);
+		stonesLeftTeam2.SetActive(false);
 		CurrentStone.setOwner(players[turn]);
+		if(players[turn].team == Player.Team.Team1){
+			team1Stones--;
+		}else if(players[turn].team == Player.Team.Team2){
+			team2Stones--;
+		}
+		SetShotsLeft();
 		CurrentStone.ClearTrail();
 		CurrentStone.gameObject.SetActive(true);
 		CurrentStone.GetComponent<Rigidbody>().AddForce(-CurrentStone.body.velocity, ForceMode.VelocityChange);
@@ -177,6 +209,8 @@ public class GameController : BootableMonoBehaviour {
 
 	private void resetShot(){
 		distanceMeter.SetActive(false);
+		stonesLeftTeam1.SetActive(true);
+		stonesLeftTeam2.SetActive(true);
 		CurrentStone = null;
 		CurrentStone.gameObject.SetActive(false);
 		followStone = false;
@@ -217,10 +251,14 @@ public class GameController : BootableMonoBehaviour {
 		return true;
 	}
 	public void StartGame2P(){
+		
 		for (int i = StonePool.Count-1; i >= 0; i--)
 		{	
 			Destroy(StonePool[i].gameObject);
 		}
+		team1Stones = 8;
+		team2Stones = 8;
+		SetShotsLeft();
 		StonePool.Clear();
 		curlingStartInfo.SetActive(false); 
 		sweepingStartInfo.SetActive(false);
