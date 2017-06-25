@@ -64,10 +64,10 @@ public class InputController : BootableMonoBehaviour {
 			if(previousPosition.Count <= 1) return;
 			
 			if(zig && previousPosition[previousPosition.Count-2].x + 0.05f < currentPosition.x){
-				GameController.Instance.LowerFriction(currentPosition.x);
+				GameController.Instance.LowerFriction(currentPosition.x, currentPosition.y);
 				zig = !zig;
 			}else if (!zig && previousPosition[previousPosition.Count-2].x - 0.05f > currentPosition.x){
-				GameController.Instance.LowerFriction(currentPosition.x);
+				GameController.Instance.LowerFriction(currentPosition.x, currentPosition.y);
 				zig = !zig;
 			}
 		}

@@ -40,11 +40,11 @@ public class GameController : BootableMonoBehaviour {
 	bool followStone;
 	public float forceMuliplyer = 1;
 
-	public void LowerFriction(float positionX){
-		if(Mathf.Abs(positionX - CurrentStone.transform.position.x) > 1.3){
+	public void LowerFriction(float positionX, float positionY){
+		if(Mathf.Abs(positionX - CurrentStone.transform.position.x) > 3 || CurrentStone.transform.position.y > positionY){
 			return;
 		}
-		CurrentStone.GetComponent<Rigidbody>().AddForce(new Vector3(10 * Time.deltaTime * (positionX - CurrentStone.transform.position.x), 0f, 0f), ForceMode.VelocityChange);
+		CurrentStone.GetComponent<Rigidbody>().AddForce(new Vector3(1.5f * Time.deltaTime * (positionX - CurrentStone.transform.position.x), 0f, 0f), ForceMode.VelocityChange);
 		floorMaterial.dynamicFriction = Mathf.Lerp(floorMaterial.dynamicFriction, 0f, 0.15f);
 	}
 	public void RestoreFriction(){
