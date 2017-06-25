@@ -6,7 +6,9 @@ using UnityEngine.UI;
 
 public class GameController : BootableMonoBehaviour {
 
-	int numberOfPlayers = 4;
+	int team1Stones;
+	int team2Stones;
+	
 	int turn = 0;
 	public List<Player> players;
 	
@@ -44,10 +46,28 @@ public class GameController : BootableMonoBehaviour {
 	}
 	bool followStone;
 	public float forceMuliplyer = 1;
+	public GameObject Team1Banner;
+	public GameObject Team2Banner;
+	public GameObject curlingStartInfo;
+	public GameObject sweepingStartInfo;
+	public float tutorialWaitTime = 0;
+	public void resetTutorialWaitTime(){
+		tutorialWaitTime=Time.time+4f;
+	}
 	public void NextTurn(){
+		resetShot();
 		turn = (turn+1) % players.Count;
+		InputController.Instance.TurnOffInput();
+		if(players[turn].team == Player.Team.Team1){
+			Team1Banner.SetActive(true);
+		}
+		else
+		{
+			Team2Banner.SetActive(true);
+		}
 	}
 	public void LowerFriction(float positionX, float positionY){
+		resetTutorialWaitTime();
 		if(Mathf.Abs(positionX - CurrentStone.transform.position.x) > 3 || CurrentStone.transform.position.y > positionY){
 			return;
 		}
@@ -58,6 +78,7 @@ public class GameController : BootableMonoBehaviour {
 		floorMaterial.dynamicFriction = Mathf.Lerp(floorMaterial.dynamicFriction, originalFriction, 0.05f);
 	}
 	public void SetThrowingStone(Vector3 position){
+		resetTutorialWaitTime();
 		CurrentStone.setOwner(players[turn]);
 		if(
 			position.z > -36 ||
@@ -74,6 +95,7 @@ public class GameController : BootableMonoBehaviour {
 		CurrentStone.GetComponent<Rigidbody>().AddForce(-CurrentStone.body.velocity, ForceMode.VelocityChange);
 	}
 	public void ThrowStone(Vector3 position, Vector3 forceVector){
+		resetTutorialWaitTime();
 		if(
 			position.z > -36 ||
 			(Camera.main.transform.position - restingCameraPosition).magnitude > 0.1f
@@ -93,7 +115,6 @@ public class GameController : BootableMonoBehaviour {
 		InputController.Instance.throwing = false;
 		InputController.Instance.sweeping = true;
 		followStone = true;
-		NextTurn();
 	}
 
 	private static GameController _instance;
@@ -112,6 +133,16 @@ public class GameController : BootableMonoBehaviour {
 	}
 	// Update is called once per frame
 	void Update () {
+		if(InputController.Instance.throwing && tutorialWaitTime<Time.time){
+			curlingStartInfo.SetActive(true);
+		}else if (curlingStartInfo.activeSelf){
+			curlingStartInfo.SetActive(false);
+		}
+		if(InputController.Instance.sweeping && tutorialWaitTime<Time.time){
+			sweepingStartInfo.SetActive(true);
+		}else if (sweepingStartInfo.activeSelf){
+			sweepingStartInfo.SetActive(false);
+		}
 
 	}
 
@@ -140,7 +171,7 @@ public class GameController : BootableMonoBehaviour {
 		if(!InputController.Instance.throwing && atRestCount == 10){
 			Debug.Log("Stones are at rest, resetting shot");
 			CleanUpOutOfBounds();
-			resetShot();
+			NextTurn();
 		}
 	}
 
@@ -154,6 +185,7 @@ public class GameController : BootableMonoBehaviour {
 	}
 
 	public void CleanUpFallenStones(){
+		if(StonePool.Count == 0) return;
 		for (int i = 0; i < StonePool.Count; i++)
 		{
 			if(StonePool[i].gameObject.activeSelf && StonePool[i].transform.position.y < -1){
@@ -163,6 +195,7 @@ public class GameController : BootableMonoBehaviour {
 		}
 	}
 	public void CleanUpOutOfBounds(){
+		if(StonePool.Count == 0) return;
 		for (int i = 0; i < StonePool.Count; i++)
 		{	
 			if(StonePool[i].gameObject.activeSelf){
@@ -174,6 +207,7 @@ public class GameController : BootableMonoBehaviour {
 		}
 	}
 	public bool StonesAreAtRest(){
+		if(StonePool.Count == 0) return false;
 		for (int i = 0; i < StonePool.Count; i++)
 		{	
 			if(StonePool[i].gameObject.activeSelf && StonePool[i].body.velocity.magnitude > 0.001){
@@ -182,15 +216,31 @@ public class GameController : BootableMonoBehaviour {
 		}
 		return true;
 	}
-
-	public override void Boot(){
-		InputController.Instance.throwing = true;
-		InputController.Instance.sweeping = false;
-		NetworkController.Instance.RegisterReady(NetworkControllerIsReady);
-		NetworkController.Instance.Init();
+	public void StartGame2P(){
+		for (int i = StonePool.Count-1; i >= 0; i--)
+		{	
+			Destroy(StonePool[i].gameObject);
+		}
+		StonePool.Clear();
+		curlingStartInfo.SetActive(false); 
+		sweepingStartInfo.SetActive(false);
+		Team1Banner.SetActive(false); 
+		Team2Banner.SetActive(false);
+		resetShot();
+		resetTutorialWaitTime();
 		players = new List<Player>();
 		players.Add(new Player(Player.Team.Team1, 1));
 		players.Add(new Player(Player.Team.Team2, 2));
+		team1Stones = 8;
+		team2Stones = 8;
+		turn = -1;
+		NextTurn();
+	}
+	
+	public override void Boot(){
+		StartGame2P();
+		//NetworkController.Instance.RegisterReady(NetworkControllerIsReady);
+		//NetworkController.Instance.Init();
 	}
 
 	private void NetworkControllerIsReady(){
