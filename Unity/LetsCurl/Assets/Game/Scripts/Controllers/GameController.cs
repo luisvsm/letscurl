@@ -77,6 +77,44 @@ public class GameController : BootableMonoBehaviour {
 			}
 		}
 	}
+	float gameOverTimer;
+	public bool IsGameOver(){
+		return team1Stones <= 0 && team2Stones <= 0;
+	}
+	int team1Score;
+	int team2Score;
+	public void CalculateScore(){
+		float team1Distance=999;
+		float team2Distance=999;
+		Vector3 centre = new Vector3(0f, -0.05f, 57f);
+		for (int i = 0; i < StonePool.Count; i++)
+		{
+			if(StonePool[i].team == Player.Team.Team1){
+				team1Distance = Mathf.Min(Vector3.Distance(StonePool[i].transform.position,centre), team1Distance);
+			}else if(StonePool[i].team == Player.Team.Team2){
+				team2Distance = Mathf.Min(Vector3.Distance(StonePool[i].transform.position,centre), team2Distance);
+			}
+		}
+		if(team1Distance<team2Distance){
+			for (int i = 0; i < StonePool.Count; i++)
+			{
+				if(StonePool[i].team == Player.Team.Team1 && Vector3.Distance(StonePool[i].transform.position,centre)<team2Distance){
+					team1Score++;
+				}
+			}
+		}else{
+			for (int i = 0; i < StonePool.Count; i++)
+			{
+				if(StonePool[i].team == Player.Team.Team2 && Vector3.Distance(StonePool[i].transform.position,centre)<team1Distance){
+					team2Score++;
+				}
+			}
+		}
+
+		if(IsGameOver()){
+
+		}
+	}
 	public void NextTurn(){
 		resetShot();
 		turn = (turn+1) % players.Count;
@@ -163,8 +201,10 @@ public class GameController : BootableMonoBehaviour {
 	void Start () {
 
 	}
+	public Text score;
 	// Update is called once per frame
 	void Update () {
+		score.text = "Team1: " + team1Score +  "Team2: " + team2Score;
 		if(InputController.Instance.throwing && tutorialWaitTime<Time.time){
 			curlingStartInfo.SetActive(true);
 		}else if (curlingStartInfo.activeSelf){
@@ -201,9 +241,14 @@ public class GameController : BootableMonoBehaviour {
 		}
 
 		if(!InputController.Instance.throwing && atRestCount == 10){
-			Debug.Log("Stones are at rest, resetting shot");
-			CleanUpOutOfBounds();
-			NextTurn();
+			if(IsGameOver()){
+				CalculateScore();
+				StartGame2P();
+			}else{
+				Debug.Log("Stones are at rest, resetting shot");
+				CleanUpOutOfBounds();
+				NextTurn();
+			}
 		}
 	}
 

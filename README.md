@@ -5,14 +5,13 @@
 - [x] Get Websockets working in WebGL
 - [x] Make curling scene
 - [x] Make stones
-- [ ] Make sweeping mechanic
-- [ ] Make skip role (stick and angle of stick for rotation)
-- [ ] Make throwing mechanic
-- [ ] Remove stones that don't make the hogline or go past the hackline (double line that your throw from)
-- [ ] Remove stones that hit a side of the play field
-- [ ] Remove stones that are hit, at the end of a turn
-- [ ] Set up scoring (8 ends for fun games)
-- [ ] Make lobby
+- [x] Make sweeping mechanic
+- [x] Make throwing mechanic
+- [x] Remove stones that don't make the hogline or go past the hackline (double line that your throw from)
+- [x] Remove stones that hit a side of the play field
+- [x] Remove stones that are hit, at the end of a turn
+- [ ] Set up scoring
+- [ ] Set up end of game
 
 ## About
 Deakin Winter Jam 2017
