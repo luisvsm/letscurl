@@ -6,11 +6,12 @@ using UnityEngine.UI;
 
 public class GameController : BootableMonoBehaviour {
 	public Animator outOfBoundsAnimation;
-	public float targetFriction = 0.08f;
+	public PhysicMaterial floorMaterial;
 	public GameObject distanceMeter;
 	public Text distanceMeterText;
 	public GameObject stonePrefab;
 	private GameObject _currentStone;
+	public float originalFriction = 0.08f;
 	List<GameObject> StonePool = new List<GameObject>();
 	public Vector3 followCameraPosition = new Vector3(0f, 38.3f, -15f);
 	public Vector3 followRotation = new Vector3(56.3f, 0f, 0f);
@@ -38,6 +39,17 @@ public class GameController : BootableMonoBehaviour {
 	}
 	bool followStone;
 	public float forceMuliplyer = 1;
+
+	public void LowerFriction(float positionX){
+		if(Mathf.Abs(positionX - CurrentStone.transform.position.x) > 1.3){
+			return;
+		}
+		CurrentStone.GetComponent<Rigidbody>().AddForce(new Vector3(10 * Time.deltaTime * (positionX - CurrentStone.transform.position.x), 0f, 0f), ForceMode.VelocityChange);
+		floorMaterial.dynamicFriction = Mathf.Lerp(floorMaterial.dynamicFriction, 0f, 0.15f);
+	}
+	public void RestoreFriction(){
+		floorMaterial.dynamicFriction = Mathf.Lerp(floorMaterial.dynamicFriction, originalFriction, 0.05f);
+	}
 	public void SetThrowingStone(Vector3 position){
 		if(
 			position.z > -36 ||
@@ -67,7 +79,8 @@ public class GameController : BootableMonoBehaviour {
 		CurrentStone.transform.position = position;
 		CurrentStone.transform.eulerAngles = new Vector3(0f,0f,0f);
 		CurrentStone.GetComponent<Rigidbody>().AddForce((forceVector*forceMuliplyer), ForceMode.VelocityChange);
-		InputController.Instance.TurnOffInput();
+		InputController.Instance.throwing = false;
+		InputController.Instance.sweeping = true;
 		followStone = true;
 	}
 
@@ -83,14 +96,17 @@ public class GameController : BootableMonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		InputController.Instance.TurnOnInput();
+
 	}
 	// Update is called once per frame
 	void Update () {
+
 	}
 
 	int atRestCount;
 	void FixedUpdate(){
+		RestoreFriction();
+
 		distanceMeterText.text = Math.Round((CurrentStone.transform.position - new Vector3(0f, -0.05f, 57f)).magnitude, 2).ToString();
 		if(followStone){
 			Camera.main.transform.position = Vector3.Lerp(Camera.main.transform.position, new Vector3(followCameraPosition.x, followCameraPosition.y, CurrentStone.transform.position.z + followCameraPosition.z), 0.3f);
@@ -102,14 +118,15 @@ public class GameController : BootableMonoBehaviour {
 		CleanUpFallenStones();
 
 		if(StonesAreAtRest()){
-			Debug.Log("Stones are resting");
+			
 			if(atRestCount < 10)
 				atRestCount++;
 		}else{
 			atRestCount = 0;
 		}
 
-		if(!InputController.Instance.InputIsOn() && atRestCount == 10){
+		if(!InputController.Instance.throwing && atRestCount == 10){
+			Debug.Log("Stones are at rest, resetting shot");
 			CleanUpOutOfBounds();
 			resetShot();
 		}
@@ -120,7 +137,8 @@ public class GameController : BootableMonoBehaviour {
 		CurrentStone = null;
 		CurrentStone.SetActive(false);
 		followStone = false;
-		InputController.Instance.TurnOnInput();
+		InputController.Instance.throwing = true;
+		InputController.Instance.sweeping = false;
 	}
 
 	public void CleanUpFallenStones(){
@@ -154,6 +172,8 @@ public class GameController : BootableMonoBehaviour {
 	}
 
 	public override void Boot(){
+		InputController.Instance.throwing = true;
+		InputController.Instance.sweeping = false;
 		NetworkController.Instance.RegisterReady(NetworkControllerIsReady);
 		NetworkController.Instance.Init();
 	}
